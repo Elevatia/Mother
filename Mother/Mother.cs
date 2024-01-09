@@ -15,20 +15,32 @@ namespace Mother
         {
             readMethods = new Dictionary<Type, Func<BinaryReader, object>>
             {
-                { typeof(int), reader => reader.ReadInt32() },
                 { typeof(string), reader => reader.ReadString() },
                 { typeof(byte), reader => reader.ReadByte() },
                 { typeof(bool), reader => reader.ReadBoolean() },
-                { typeof(decimal), reader => reader.ReadDecimal()}
+                { typeof(decimal), reader => reader.ReadDecimal() },
+                { typeof(char), reader => reader.ReadChar() },
+                { typeof(double), reader => reader.ReadDouble() },
+                { typeof(Half), reader => reader.ReadHalf() },
+                { typeof(Int16), reader => reader.ReadInt16() },
+                { typeof(Int32), reader => reader.ReadInt32() },
+                { typeof(Int64), reader => reader.ReadInt64() },
+                { typeof(Single), reader => reader.ReadSingle() },
             };
 
             writeMethods = new Dictionary<Type, Action<BinaryWriter, object>>
             {
-                { typeof(int), (writer, value) => writer.Write((int)value) },
                 { typeof(string), (writer, value) => writer.Write((string)value) },
                 { typeof(byte), (writer, value) => writer.Write((byte)value) },
                 { typeof(bool), (writer, value) => writer.Write((bool)value) },
-                { typeof(decimal), (writer, value) => writer.Write((decimal)value) }
+                { typeof(decimal), (writer, value) => writer.Write((decimal)value) },
+                { typeof(char), (writer, value) => writer.Write((char)value) },
+                { typeof(double), (writer, value) => writer.Write((double)value) },
+                { typeof(Half), (writer, value) => writer.Write((Half)value) },
+                { typeof(Int16), (writer, value) => writer.Write((Int16)value) },
+                { typeof(Int32), (writer, value) => writer.Write((Int32)value) },
+                { typeof(Int64), (writer, value) => writer.Write((Int64)value) },
+                { typeof(Single), (writer, value) => writer.Write((Single)value) },
             };
         }
 
@@ -103,5 +115,22 @@ namespace Mother
 
             return result;
         }
+
+        private static object ReadEnum(BinaryReader reader)
+        {
+            string enumTypeName = reader.ReadString();
+            Type enumType = Type.GetType(enumTypeName);
+            int enumValue = reader.ReadInt32();
+            Enum enumResult = (Enum)Enum.ToObject(enumType, enumValue);
+
+            return enumResult;
+        }
+
+        private static void WriteEnum(BinaryWriter writer, Enum value)
+        {
+            writer.Write(value.GetType().AssemblyQualifiedName);
+            writer.Write(Convert.ToInt32(value));
+        }
+
     }
 }
